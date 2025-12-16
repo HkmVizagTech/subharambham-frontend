@@ -27,8 +27,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import SubharambhamLogo from './component/newLogo.png';
 import natureBg from './component/Subharambham-nature.jpg';
-import { apiBase } from './utils/api';
-const API_BASE = apiBase;
+const API_BASE =
+  'https://hkm-subharambham-backend-882278565284.asia-south1.run.app';
 
 export default function ThankYouPage() {
   const { id } = useParams();
