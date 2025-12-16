@@ -52,13 +52,11 @@ const initialState = {
   // studentIdCardPreview: '', // Preview URL
 };
 
-// const RAZORPAY_KEY = "rzp_live_HBAc3tlMK0X5Xd";
-const RAZORPAY_KEY = 'rzp_test_3eGEKQNbKqH27f'; // Test key
+const RAZORPAY_KEY = 'rzp_live_HBAc3tlMK0X5Xd';
+// const RAZORPAY_KEY = 'rzp_test_3eGEKQNbKqH27f'; // Test key
 
 // Ensure this matches your local or production backend URL
-const API_BASE = `${
-  process.env.REACT_APP_API_BASE_URL || 'http://localhost:3300'
-}/users`;
+const API_BASE = `${process.env.REACT_APP_API_BASE_URL}/users`;
 
 const Main = () => {
   const toast = useToast();
