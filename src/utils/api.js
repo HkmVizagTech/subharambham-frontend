@@ -1,4 +1,4 @@
-export const apiBase = process.env.REACT_APP_API_BASE_URL;
+export const apiBase = `https://hkm-subharambham-backend-882278565284.asia-south1.run.app`;
 
 export async function apiFetch(path, options = {}) {
   const token =
