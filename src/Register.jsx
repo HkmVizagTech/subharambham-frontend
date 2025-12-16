@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   Box,
   Button,
@@ -8,33 +8,33 @@ import {
   VStack,
   Heading,
   useToast,
-} from "@chakra-ui/react";
+} from '@chakra-ui/react';
 
 const Register = () => {
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
+    name: '',
+    email: '',
+    password: '',
   });
   const [isLoading, setIsLoading] = useState(false);
   const toast = useToast();
 
-  const handleChange = (e) => {
+  const handleChange = e => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const base = process.env.REACT_APP_API_BASE_URL || 'http://localhost:3300';
+      const base = process.env.REACT_APP_API_BASE_URL;
       const res = await fetch(`${base}/admin/users/register`, {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify(formData),
       });
@@ -43,27 +43,27 @@ const Register = () => {
 
       if (res.ok) {
         toast({
-          title: "Registration Successful.",
-          description: "Admin registered successfully.",
-          status: "success",
+          title: 'Registration Successful.',
+          description: 'Admin registered successfully.',
+          status: 'success',
           duration: 3000,
           isClosable: true,
         });
-        setFormData({ name: "", email: "", password: "" });
+        setFormData({ name: '', email: '', password: '' });
       } else {
         toast({
-          title: "Registration Failed.",
-          description: data.message || "Something went wrong.",
-          status: "error",
+          title: 'Registration Failed.',
+          description: data.message || 'Something went wrong.',
+          status: 'error',
           duration: 3000,
           isClosable: true,
         });
       }
     } catch (error) {
       toast({
-        title: "Error.",
-        description: "Network error, please try again.",
-        status: "error",
+        title: 'Error.',
+        description: 'Network error, please try again.',
+        status: 'error',
         duration: 3000,
         isClosable: true,
       });
@@ -73,8 +73,18 @@ const Register = () => {
   };
 
   return (
-    <Box maxW="md" mx="auto" mt={10} p={6} borderWidth={1} borderRadius="lg" boxShadow="md" >
-      <Heading mb={6} textAlign="center" size="md">Admin Authentication</Heading>
+    <Box
+      maxW="md"
+      mx="auto"
+      mt={10}
+      p={6}
+      borderWidth={1}
+      borderRadius="lg"
+      boxShadow="md"
+    >
+      <Heading mb={6} textAlign="center" size="md">
+        Admin Authentication
+      </Heading>
       <form onSubmit={handleSubmit}>
         <VStack spacing={4}>
           <FormControl isRequired>
@@ -107,7 +117,12 @@ const Register = () => {
               onChange={handleChange}
             />
           </FormControl>
-          <Button colorScheme="teal" type="submit" isLoading={isLoading} width="full">
+          <Button
+            colorScheme="teal"
+            type="submit"
+            isLoading={isLoading}
+            width="full"
+          >
             Register
           </Button>
         </VStack>
