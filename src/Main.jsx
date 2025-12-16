@@ -33,6 +33,7 @@ import Select from 'react-select';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import natureBg from './component/Subharambham-nature.jpg';
+import { apiBase } from './utils/api';
 
 const initialState = {
   serialNo: '', // 123456
@@ -56,7 +57,7 @@ const RAZORPAY_KEY = 'rzp_live_HBAc3tlMK0X5Xd';
 // const RAZORPAY_KEY = 'rzp_test_3eGEKQNbKqH27f'; // Test key
 
 // Ensure this matches your local or production backend URL
-const API_BASE = `${process.env.REACT_APP_API_BASE_URL}/users`;
+const API_BASE = `${apiBase}/users`;
 
 const Main = () => {
   const toast = useToast();

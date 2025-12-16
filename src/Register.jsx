@@ -9,6 +9,7 @@ import {
   Heading,
   useToast,
 } from '@chakra-ui/react';
+import { apiBase } from './utils/api';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -30,7 +31,7 @@ const Register = () => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const base = process.env.REACT_APP_API_BASE_URL;
+      const base = apiBase;
       const res = await fetch(`${base}/admin/users/register`, {
         method: 'POST',
         headers: {

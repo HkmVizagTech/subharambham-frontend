@@ -10,6 +10,7 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
+import { apiBase } from './utils/api';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -32,7 +33,7 @@ const Login = () => {
     setIsLoading(true);
     try {
       // const res = await fetch("https://hkm-Subharambham-backend-882278565284.europe-west1.run.app/admin/users/login",
-      const base = process.env.REACT_APP_API_BASE_URL;
+      const base = apiBase;
       const res = await fetch(`${base}/admin/users/login`, {
         method: 'POST',
         headers: {

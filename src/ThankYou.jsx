@@ -27,7 +27,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import SubharambhamLogo from './component/newLogo.png';
 import natureBg from './component/Subharambham-nature.jpg';
-const API_BASE = process.env.REACT_APP_API_BASE_URL;
+import { apiBase } from './utils/api';
+const API_BASE = apiBase;
 
 export default function ThankYouPage() {
   const { id } = useParams();
