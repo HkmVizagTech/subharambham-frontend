@@ -52,8 +52,8 @@ const initialState = {
   // studentIdCardPreview: '', // Preview URL
 };
 
-const RAZORPAY_KEY = 'rzp_live_HBAc3tlMK0X5Xd';
-// const RAZORPAY_KEY = 'rzp_test_3eGEKQNbKqH27f'; // Test key
+// const RAZORPAY_KEY = 'rzp_live_HBAc3tlMK0X5Xd';
+const RAZORPAY_KEY = 'rzp_test_3eGEKQNbKqH27f'; // Test key
 
 // Ensure this matches your local or production backend URL
 const API_BASE = `https://hkm-subharambham-backend-882278565284.asia-south1.run.app/users`;
