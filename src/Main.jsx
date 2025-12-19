@@ -222,7 +222,7 @@ const Main = () => {
     // Student ID card is now optional for college students
 
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    return Object.keys(newErrors).length === 0; // No errors
   };
 
   const handlePayment = async () => {
@@ -406,19 +406,24 @@ const Main = () => {
           flexWrap="nowrap"
         >
           <Box
-            boxSize={{ base: '180px', md: '150px' }}
+            boxSize={{ base: '24vw', sm: '28vw', md: '150px', lg: '180px' }}
             borderRadius="full"
             overflow="hidden"
             boxShadow="0 4px 24px 0 rgba(32,96,61,0.08)"
             border="3px solid #20603d"
-            bg="white"
+            // bg="white"
+            flexShrink={0}
+            aspectRatio="1 / 1"
           >
             <Image
               src={image12}
-              alt="Hare Krishna Movement Logo"
-              objectFit="cover"
+              alt="Subharambham Logo"
+              objectFit="contain"
+              objectPosition="center"
+              borderRadius="full"
               width="100%"
               height="100%"
+              display="block"
             />
           </Box>
           <Box textAlign="left">

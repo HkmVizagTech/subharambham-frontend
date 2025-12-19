@@ -23,19 +23,32 @@ import {
   Mail,
   ArrowLeft,
 } from 'lucide-react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
+import { QRCodeSVG } from 'qrcode.react';
 import SubharambhamLogo from './component/newLogo.png';
 import natureBg from './component/Subharambham-nature.jpg';
 const API_BASE =
   'https://hkm-subharambham-backend-882278565284.asia-south1.run.app';
+const WHATSAPP_GROUP_URL = 'https://chat.whatsapp.com/KyYp3n1bYJv3kZ9pXG6Z5F';
 
 export default function ThankYouPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const isPreview = searchParams.get('preview') === '1' || id === 'preview';
 
-  const [status, setStatus] = useState('loading');
-  const [candidate, setCandidate] = useState(null);
+  const [status, setStatus] = useState(isPreview ? 'success' : 'loading');
+  const [candidate, setCandidate] = useState(
+    isPreview
+      ? {
+          name: 'Demo User',
+          paymentAmount: 99,
+          paymentId: 'DEMO_PAYMENT_ID',
+          orderId: 'DEMO_ORDER_ID',
+        }
+      : null
+  );
 
   const checkPaymentStatus = async (showLoading = true) => {
     if (showLoading) setStatus('loading');
@@ -124,6 +137,9 @@ export default function ThankYouPage() {
   };
 
   useEffect(() => {
+    if (isPreview) {
+      return; // Skip polling in preview mode
+    }
     let attempts = 0;
     const maxAttempts = 12; // Increased from 10 to 12
     let pollInterval;
@@ -372,12 +388,25 @@ export default function ThankYouPage() {
           textAlign="left"
           flexWrap="wrap"
         >
-          <Box position="relative" minW="96px">
+          <Box
+            position="relative"
+            boxSize={{ base: '72px', sm: '84px', md: '96px' }}
+            borderRadius="full"
+            overflow="hidden"
+            border="3px solid #20603d"
+            flexShrink={0}
+            aspectRatio="1 / 1"
+            bg="white"
+          >
             <Image
               src={SubharambhamLogo}
               alt="Subharambham Youth Festival Logo"
-              boxSize="96px"
-              rounded="full"
+              width="100%"
+              height="100%"
+              objectFit="contain"
+              objectPosition="center"
+              borderRadius="full"
+              display="block"
               shadow="lg"
             />
             <Center
@@ -466,26 +495,77 @@ export default function ThankYouPage() {
                 </Box>
               </Flex>
 
-              <Flex align="center" gap={3} p={3} bg="green.50" rounded="lg">
-                <Icon as={Phone} w={5} h={5} color="#20603d" />
-                <Box>
-                  <Text fontWeight="semibold">WhatsApp Updates</Text>
-                  <Text fontSize="sm" color="gray.600">
-                    You'll receive event updates in WhatsApp group.
-                  </Text>
-                </Box>
-                <Box>
-                  {/* whatsapp group link */}
-                  <Link
-                    href="https://chat.whatsapp.com/KyYp3n1bYJv3kZ9pXG6Z5F"
-                    color="#20603d"
-                    fontWeight="semibold"
-                    ml={4}
+              <Box
+                bgGradient="linear(to-r, #128C7E, #25D366)"
+                color="white"
+                rounded="xl"
+                p={{ base: 4, md: 5 }}
+                shadow="xl"
+              >
+                <Stack
+                  direction={{ base: 'column', md: 'row' }}
+                  align="center"
+                  justify="space-between"
+                  spacing={{ base: 4, md: 6 }}
+                >
+                  <VStack align="start" spacing={1} flex={1}>
+                    <Text fontWeight="bold" fontSize={{ base: 'md', md: 'lg' }}>
+                      Join our WhatsApp Group
+                    </Text>
+                    <Text fontSize={{ base: 'sm', md: 'sm' }} opacity={0.95}>
+                      Tap join or scan the QR to get flash updates, reminders,
+                      photos, and important announcements.
+                    </Text>
+                  </VStack>
+
+                  <Stack
+                    direction={{ base: 'column', md: 'row' }}
+                    align="center"
+                    spacing={{ base: 3, md: 4 }}
                   >
-                    Join Group
-                  </Link>
-                </Box>
-              </Flex>
+                    <Button
+                      as="a"
+                      href={WHATSAPP_GROUP_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      size={{ base: 'md', md: 'lg' }}
+                      bg="#25D366"
+                      color="white"
+                      _hover={{
+                        bg: '#1EBE57',
+                        transform: 'translateY(-1px)',
+                        boxShadow: 'lg',
+                      }}
+                      _active={{ bg: '#1AAE50' }}
+                      leftIcon={
+                        <Icon
+                          viewBox="0 0 24 24"
+                          w={{ base: 5, md: 6 }}
+                          h={{ base: 5, md: 6 }}
+                        >
+                          <path
+                            fill="currentColor"
+                            d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.472-.149-.672.15-.198.297-.767.966-.94 1.164-.173.198-.347.223-.644.074-.297-.149-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.173.198-.298.298-.497.099-.198.05-.372-.025-.521-.075-.149-.672-1.613-.922-2.207-.242-.579-.487-.5-.672-.51-.173-.009-.372-.011-.571-.011-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.262.489 1.694.625.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.999-3.648-.235-.374a9.86 9.86 0 0 1-1.514-5.26c.001-5.45 4.436-9.883 9.888-9.883 2.64 0 5.112 1.03 6.963 2.9a9.825 9.825 0 0 1 2.914 6.957c-.003 5.45-4.436 9.884-9.886 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.305-1.654a11.86 11.86 0 0 0 5.717 1.459h.005c6.554 0 11.89-5.336 11.893-11.893a11.821 11.821 0 0 0-3.464-8.413"
+                          />
+                        </Icon>
+                      }
+                      px={{ base: 5, md: 6 }}
+                      fontWeight="bold"
+                    >
+                      Join WhatsApp Group
+                    </Button>
+
+                    <Box
+                      display={{ base: 'none', sm: 'block' }}
+                      bg="white"
+                      p={2}
+                      rounded="md"
+                    >
+                      <QRCodeSVG value={WHATSAPP_GROUP_URL} size={72} />
+                    </Box>
+                  </Stack>
+                </Stack>
+              </Box>
 
               <Flex align="center" gap={3} p={3} bg="green.50" rounded="lg">
                 <Box>

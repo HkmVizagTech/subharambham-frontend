@@ -312,9 +312,9 @@ const Attendence = () => {
             <Box mt={6}>
               <Image
                 mx="auto"
-                src="https://cdn.dribbble.com/users/1615584/screenshots/4187826/check02.gif"
+                src="/Success.gif"
                 alt="Success"
-                boxSize="80px"
+                boxSize="180px"
                 borderRadius="full"
                 objectFit="cover"
               />
