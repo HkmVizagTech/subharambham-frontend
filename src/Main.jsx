@@ -57,6 +57,7 @@ const RAZORPAY_KEY = 'rzp_live_HBAc3tlMK0X5Xd';
 
 // Ensure this matches your local or production backend URL
 const API_BASE = `https://hkm-subharambham-backend-882278565284.asia-south1.run.app/users`;
+// const API_BASE = 'http://localhost:3300/users';
 
 const Main = () => {
   const toast = useToast();
@@ -306,7 +307,25 @@ const Main = () => {
                 isClosable: true,
                 position: 'top-right',
               });
-              navigate(`/thankyou/${response.razorpay_payment_id}`);
+              // Persist minimal registration meta for ThankYou resolution
+              try {
+                const metaKey = `regMeta:${response.razorpay_payment_id}`;
+                const metaVal = {
+                  gender: finalFormData.gender,
+                  email: finalFormData.email,
+                };
+                localStorage.setItem(metaKey, JSON.stringify(metaVal));
+              } catch (e) {
+                console.warn('Could not persist reg meta:', e);
+              }
+
+              // Navigate with state so ThankYou can resolve gender immediately
+              navigate(`/thankyou/${response.razorpay_payment_id}`, {
+                state: {
+                  gender: finalFormData.gender,
+                  email: finalFormData.email,
+                },
+              });
             } else {
               throw new Error(result.message);
             }
@@ -384,30 +403,37 @@ const Main = () => {
   return (
     <Box
       minH="100vh"
-      bgImage={`url(${natureBg})`}
-      bgAttachment="fixed"
+      bgImage={`linear-gradient(to right, rgba(11,61,145,0.82), rgba(106,13,173,0.82)), url(${natureBg})`}
+      // bgAttachment=""
       bgSize="cover"
-      bgPosition="center"
+      bgPosition="10% 40%"
       py={{ base: 2, md: 10 }}
       px={0}
-      style={{
-        backgroundColor: '#e9f8ef',
-        backgroundBlendMode: 'overlay',
-      }}
+      // style={{
+      //   backgroundColor: 'rgba(106,13,173,0.82), rgba(11,61,145,0.82)',
+      //   backgroundBlendMode: 'overlay',
+      // }}
     >
       <Container maxW="2xl" px={2} zIndex={1}>
         <Flex
           direction="row"
           align="center"
           justify="space-between"
-          gap={6}
-          mb={8}
+          bg="rgba(255, 255, 255, 1)"
+          boxShadow="0 4px 24px 0 rgba(32,96,61,0.13)"
+          borderRadius="2xl"
+          gap={2}
+          mb={2}
+          p={2}
           textAlign="left"
+          alignItems="center"
           flexWrap="nowrap"
         >
           <Box
             boxSize={{ base: '24vw', sm: '28vw', md: '150px', lg: '180px' }}
             borderRadius="full"
+            alignItems="center"
+            justifyContent="center"
             overflow="hidden"
             boxShadow="0 4px 24px 0 rgba(32,96,61,0.08)"
             border="3px solid #20603d"
@@ -426,7 +452,7 @@ const Main = () => {
               display="block"
             />
           </Box>
-          <Box textAlign="left">
+          <Box textAlign="left" p={4}>
             <Heading
               fontSize={{ base: '2xl', md: '3xl' }}
               color="#20603d"
@@ -452,7 +478,7 @@ const Main = () => {
           bg="rgba(255,255,255,0.97)"
           boxShadow="0 4px 24px 0 rgba(32,96,61,0.13)"
           borderRadius="2xl"
-          mb={8}
+          mb={2}
         >
           <CardBody>
             <Stack
@@ -517,7 +543,7 @@ const Main = () => {
           bg="rgba(255,255,255,0.94)"
           boxShadow="0 4px 24px 0 rgba(32,96,61,0.11)"
           borderRadius="2xl"
-          mb={8}
+          mb={3}
         >
           <CardBody>
             <Divider my={2} />
@@ -937,7 +963,7 @@ const Main = () => {
           </CardBody>
         </Card>
         <Box mt={8} textAlign="center">
-          <Text fontSize="md" color="#20603d" fontWeight="semibold">
+          <Text fontSize="md" color="#ffffffff" fontWeight="semibold">
             Hare Krishna Hare Krishna Krishna Krishna Hare Hare Hare Rama Hare
             Rama Rama Rama Hare Hare
           </Text>
