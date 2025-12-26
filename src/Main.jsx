@@ -1105,7 +1105,7 @@ const Main = () => {
                   ? 'Register Now for ₹99'
                   : 'Register Now'}
               </Button>
-              <Text textAlign="center" fontSize="md" mt={4} color="#20603d">
+              {/* <Text textAlign="center" fontSize="md" mt={4} color="#20603d">
                 For any queries, contact us at{' '}
                 <Text
                   as="a"
@@ -1114,7 +1114,7 @@ const Main = () => {
                 >
                   krishnapulse@gmail.com
                 </Text>
-              </Text>
+              </Text> */}
             </VStack>
           </CardBody>
         </Card>

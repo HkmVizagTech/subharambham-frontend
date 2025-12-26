@@ -733,7 +733,7 @@ export default function ThankYouPage() {
                 Need Help?
               </Text>
               <HStack justify="center" spacing={4} fontSize="sm">
-                <Link
+                {/* <Link
                   href="mailto:krishnapulse@gmail.com"
                   color="#20603d"
                   display="flex"
@@ -742,9 +742,9 @@ export default function ThankYouPage() {
                 >
                   <Icon as={Mail} w={4} h={4} />
                   Email Support
-                </Link>
+                </Link> */}
                 <Link
-                  href="tel:+919876543210"
+                  href="tel:+918885000924"
                   color="#20603d"
                   display="flex"
                   alignItems="center"
