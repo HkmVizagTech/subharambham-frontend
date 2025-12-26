@@ -41,6 +41,7 @@ const AdminQrScanner = () => {
 
   const lastScanRef = useRef({ value: '', time: 0 });
   const [locked, setLocked] = useState(false);
+  const lockedRef = useRef(false);
   const [countdown, setCountdown] = useState(0);
   const lockTimerRef = useRef(null);
   const LOCK_SECONDS = 4; // wait 3-5 seconds as requested, using 4s
@@ -64,8 +65,8 @@ const AdminQrScanner = () => {
             if (res) {
               const scannedText = res.getText();
               setResult(scannedText);
-              // ignore processing while locked
-              if (locked) return;
+              // ignore processing while locked (use ref to avoid stale closure)
+              if (lockedRef.current) return;
               setError('');
               setStatus('');
               setMessage('');
@@ -148,8 +149,9 @@ const AdminQrScanner = () => {
                 );
               }
               // after successful processing, lock scanning for a short countdown
-              if (!locked) {
+              if (!lockedRef.current) {
                 setLocked(true);
+                lockedRef.current = true;
                 setCountdown(LOCK_SECONDS);
                 if (lockTimerRef.current) clearInterval(lockTimerRef.current);
                 lockTimerRef.current = setInterval(() => {
@@ -158,6 +160,7 @@ const AdminQrScanner = () => {
                       clearInterval(lockTimerRef.current);
                       lockTimerRef.current = null;
                       setLocked(false);
+                      lockedRef.current = false;
                       return 0;
                     }
                     return s - 1;
@@ -181,6 +184,7 @@ const AdminQrScanner = () => {
   useEffect(() => {
     return () => {
       if (lockTimerRef.current) clearInterval(lockTimerRef.current);
+      lockedRef.current = false;
     };
   }, []);
 
@@ -230,21 +234,30 @@ const AdminQrScanner = () => {
             boxShadow: '0 2px 12px 0 rgba(44,62,80,0.07)',
           }}
         />
-        {result && (
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              fontWeight: 700,
-              fontSize: '1.1em',
-              marginBottom: '16px',
-              color: '#222',
-            }}
-          >
-            <SuccessIcon />
-            {/* <span>QR Code: <span style={{ fontWeight: 800, fontFamily: "monospace", letterSpacing: "0.5px" }}>{result}</span></span> */}
-          </div>
-        )}
+        {result &&
+          (() => {
+            const lowerMsg = (message || '').toLowerCase();
+            const isNotFound =
+              lowerMsg.includes('not found') ||
+              status === 'not-found' ||
+              status === 'not_found';
+            const showSuccess = familyMembers.length > 0 && !isNotFound;
+            if (!showSuccess && !isNotFound) return null;
+            return (
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  fontWeight: 700,
+                  fontSize: '1.1em',
+                  marginBottom: '16px',
+                  color: isNotFound ? '#f44336' : '#222',
+                }}
+              >
+                {isNotFound ? <WarningIcon /> : <SuccessIcon />}
+              </div>
+            );
+          })()}
         {familyMembers.length > 0 && (
           <div
             style={{
@@ -350,21 +363,35 @@ const AdminQrScanner = () => {
             ))}
           </div>
         )}
-        {message && (
-          <div
-            style={{
-              color: status === 'already-marked' ? '#f44336' : '#21cc51',
-              fontWeight: 700,
-              fontSize: '1.05em',
-              marginBottom: '6px',
-              display: 'flex',
-              alignItems: 'center',
-            }}
-          >
-            {status === 'already-marked' ? <WarningIcon /> : <SuccessIcon />}
-            <span>{message}</span>
-          </div>
-        )}
+        {message &&
+          (() => {
+            const lowerMsg = (message || '').toLowerCase();
+            const isNotFound =
+              lowerMsg.includes('not found') ||
+              status === 'not-found' ||
+              status === 'not_found';
+            const isAlready = status === 'already-marked';
+            const color = isNotFound
+              ? '#f44336'
+              : isAlready
+              ? '#f44336'
+              : '#21cc51';
+            return (
+              <div
+                style={{
+                  color,
+                  fontWeight: 700,
+                  fontSize: '1.05em',
+                  marginBottom: '6px',
+                  display: 'flex',
+                  alignItems: 'center',
+                }}
+              >
+                {isNotFound || isAlready ? <WarningIcon /> : <SuccessIcon />}
+                <span>{message}</span>
+              </div>
+            );
+          })()}
         {locked && (
           <div
             style={{

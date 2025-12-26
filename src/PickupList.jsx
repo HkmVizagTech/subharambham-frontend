@@ -53,6 +53,7 @@ const headers = [
   'Gender',
   'Pickup/Drop',
   'College/Company',
+  'WhatsAppNumber',
   'Payment',
   'Pickup Status',
   'Drop Status',
@@ -150,9 +151,10 @@ const PickupList = () => {
         escapeCsv(c.gender),
         escapeCsv(c.pickupDropLocation),
         escapeCsv(c.college || c.companyName),
+        escapeCsv(phoneForCsv),
         escapeCsv(c.paymentStatus),
-        escapeCsv(c.pickupStatus || (c.transportRequired ? 'Yes' : '')),
-        escapeCsv(c.dropStatus || (c.transportRequired ? 'Yes' : '')),
+        escapeCsv(c.pickupStatus || (c.transportRequired ? 'Yes' : 'No')),
+        escapeCsv(c.dropStatus || (c.transportRequired ? 'Yes' : 'No')),
       ];
       rows.push(row.join(','));
     }
@@ -291,6 +293,7 @@ const PickupList = () => {
                   <Th>Gender</Th>
                   <Th>Pickup/Drop</Th>
                   <Th>College/Company</Th>
+                  <Th>WhatsApp</Th>
                   <Th>Payment</Th>
                   <Th>Pickup Status</Th>
                   <Th>Drop Status</Th>
@@ -308,6 +311,7 @@ const PickupList = () => {
                     <Td>{c.gender}</Td>
                     <Td>{c.pickupDropLocation}</Td>
                     <Td>{c.college || c.companyName}</Td>
+                    <Td>{c.whatsappNumber}</Td>
                     <Td>
                       <Tag
                         size="sm"
@@ -326,7 +330,7 @@ const PickupList = () => {
                 ))}
                 {candidates.length === 0 && (
                   <Tr>
-                    <Td colSpan={6}>
+                    <Td colSpan={9}>
                       <Text color="gray.400" textAlign="center" py={6}>
                         No candidates found.
                       </Text>
