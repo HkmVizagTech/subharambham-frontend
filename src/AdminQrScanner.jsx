@@ -40,6 +40,10 @@ const AdminQrScanner = () => {
   const toast = useToast();
 
   const lastScanRef = useRef({ value: '', time: 0 });
+  const [locked, setLocked] = useState(false);
+  const [countdown, setCountdown] = useState(0);
+  const lockTimerRef = useRef(null);
+  const LOCK_SECONDS = 4; // wait 3-5 seconds as requested, using 4s
 
   useEffect(() => {
     const codeReader = new BrowserMultiFormatReader();
@@ -60,6 +64,8 @@ const AdminQrScanner = () => {
             if (res) {
               const scannedText = res.getText();
               setResult(scannedText);
+              // ignore processing while locked
+              if (locked) return;
               setError('');
               setStatus('');
               setMessage('');
@@ -141,6 +147,23 @@ const AdminQrScanner = () => {
                     'Error fetching candidate details'
                 );
               }
+              // after successful processing, lock scanning for a short countdown
+              if (!locked) {
+                setLocked(true);
+                setCountdown(LOCK_SECONDS);
+                if (lockTimerRef.current) clearInterval(lockTimerRef.current);
+                lockTimerRef.current = setInterval(() => {
+                  setCountdown(s => {
+                    if (s <= 1) {
+                      clearInterval(lockTimerRef.current);
+                      lockTimerRef.current = null;
+                      setLocked(false);
+                      return 0;
+                    }
+                    return s - 1;
+                  });
+                }, 1000);
+              }
             }
             if (err && !(err instanceof NotFoundException)) {
               setError(err.message || 'QR scan error');
@@ -154,6 +177,12 @@ const AdminQrScanner = () => {
       codeReader.reset();
     };
   }, [toast]);
+
+  useEffect(() => {
+    return () => {
+      if (lockTimerRef.current) clearInterval(lockTimerRef.current);
+    };
+  }, []);
 
   return (
     <div
@@ -334,6 +363,19 @@ const AdminQrScanner = () => {
           >
             {status === 'already-marked' ? <WarningIcon /> : <SuccessIcon />}
             <span>{message}</span>
+          </div>
+        )}
+        {locked && (
+          <div
+            style={{
+              marginTop: 12,
+              fontWeight: 700,
+              color: '#555',
+              fontSize: '0.95em',
+            }}
+          >
+            Please wait {countdown} second{countdown === 1 ? '' : 's'} before
+            next scan...
           </div>
         )}
         {error && (

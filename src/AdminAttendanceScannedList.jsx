@@ -40,7 +40,7 @@ const AdminAttendanceScannedList = () => {
       // token handled by api helper
 
       try {
-        const response = await api.get('/users/admin/scanned-list');
+        const response = await api.get('/users/admin/scanned-list-full');
 
         if (response.status === 401 || response.status === 403) {
           localStorage.removeItem('token');
@@ -54,7 +54,7 @@ const AdminAttendanceScannedList = () => {
 
         const records = Array.isArray(data)
           ? data
-          : data.candidates || data.records || data.scannedList || [];
+          : data.records || data.candidates || data.scannedList || [];
 
         if (Array.isArray(records)) {
           const mappedRecords = records.map(record => ({

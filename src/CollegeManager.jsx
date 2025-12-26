@@ -26,7 +26,8 @@ import axios from 'axios';
 import Layout from './component/Layout';
 import { apiBase } from './utils/api';
 
-const API_URL = `${apiBase}/college`;
+// Use /users/college to match deployed backend routing (fallback to /college exists server-side)
+const API_URL = `${apiBase}/users/college`;
 
 const CollegeManager = () => {
   const [colleges, setColleges] = useState([]);
@@ -48,6 +49,7 @@ const CollegeManager = () => {
       const res = await axios.get(API_URL);
       setColleges(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
+      console.error('fetchColleges error:', err.response || err.message || err);
       toast({ title: 'Failed to fetch colleges.', status: 'error' });
     }
     setLoading(false);
@@ -107,9 +109,17 @@ const CollegeManager = () => {
       setEditingId(null);
       fetchColleges();
     } catch (err) {
+      console.error(
+        'handleCreateOrUpdate error:',
+        err.response || err.message || err
+      );
       toast({
         title: 'Error',
-        description: err.response?.data?.error || 'Failed',
+        description:
+          err.response?.data?.error ||
+          err.response?.data?.message ||
+          err.message ||
+          'Failed',
         status: 'error',
       });
     }
@@ -138,6 +148,7 @@ const CollegeManager = () => {
       toast({ title: 'College deleted.', status: 'info' });
       fetchColleges();
     } catch (err) {
+      console.error('handleDelete error:', err.response || err.message || err);
       toast({ title: 'Delete failed.', status: 'error' });
     }
     setLoading(false);

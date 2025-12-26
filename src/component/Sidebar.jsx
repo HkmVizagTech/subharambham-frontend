@@ -32,7 +32,7 @@ const Sidebar = () => {
     sidebarLinks.push(
       { to: '/admin', label: 'All Candidates' },
       { to: '/admin/attendance', label: 'Attendance' },
-      { to: '/admin/college', label: 'College' }
+      { to: '/admin/pickup-list', label: 'Pickup/Drop List' }
       // { to: '/admin/wipe', label: 'Wipeout All Data' }
     );
   }
