@@ -40,7 +40,7 @@ const EventInfoCard = () => {
         >
           Date:{' '}
           <span style={{ fontWeight: 'normal' }}>
-            Thursday - 1st January 2026
+            Thursday - 1st January 2026 | 5PM Onwards
           </span>
         </Box>
         <Box

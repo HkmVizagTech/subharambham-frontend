@@ -22,7 +22,6 @@ import {
   chakra,
   HStack,
   VStack,
-  Image,
   Modal,
   ModalOverlay,
   ModalContent,
@@ -286,8 +285,9 @@ const CandidateExport = () => {
         'Registration Date': row.registrationDate
           ? new Date(row.registrationDate).toLocaleString()
           : '',
-        // 'Student ID Card URL': row.studentIdCardUrl || 'N/A',
         Attendance: row.attendance ? 'Yes' : 'No',
+        'Transport Required': row.transportRequired ? 'Yes' : 'No',
+        'Pickup/Drop Location': row.pickupDropLocation || '-',
         'Admin Action': row.adminAction || 'Pending',
         'Admin Action Date': row.adminActionDate
           ? new Date(row.adminActionDate).toLocaleString()
@@ -496,6 +496,8 @@ const CandidateExport = () => {
                 <Th>Payment Method</Th>
                 <Th>Source</Th>
                 <Th>Attendance</Th>
+                <Th>Transport</Th>
+                <Th>Pickup/Drop Location</Th>
                 <Th>Admin Action</Th>
               </Tr>
             </Thead>
@@ -519,7 +521,6 @@ const CandidateExport = () => {
                     </HStack>
                   </Td>
                   <Td>{candidate.gender}</Td>
-
                   <Td>
                     <Tooltip label={candidate.whatsappNumber} fontSize="xs">
                       <HStack spacing={1}>
@@ -541,75 +542,6 @@ const CandidateExport = () => {
                   </Td>
                   <Td>{candidate.course || '-'}</Td>
                   <Td>{candidate.year || '-'}</Td>
-                  {/* <Td>
-                    {candidate.studentIdCardUrl ? (
-                      <VStack spacing={2} align="center">
-                        <Image
-                          src={candidate.studentIdCardUrl}
-                          alt="Student ID Card"
-                          boxSize="60px"
-                          objectFit="cover"
-                          borderRadius="md"
-                          border="1px solid"
-                          borderColor="gray.200"
-                          cursor="pointer"
-                          onClick={() =>
-                            window.open(candidate.studentIdCardUrl, '_blank')
-                          }
-                          _hover={{ transform: 'scale(1.05)', boxShadow: 'md' }}
-                          transition="all 0.2s"
-                        />
-                        <Button
-                          size="xs"
-                          colorScheme="blue"
-                          variant="outline"
-                          onClick={() =>
-                            window.open(candidate.studentIdCardUrl, '_blank')
-                          }
-                        >
-                          View Full
-                        </Button>
-                      </VStack>
-                    ) : candidate.collegeOrWorking === 'College' ? (
-                      <VStack spacing={1}>
-                        <Box
-                          boxSize="60px"
-                          bg="red.50"
-                          border="2px dashed"
-                          borderColor="red.200"
-                          borderRadius="md"
-                          display="flex"
-                          alignItems="center"
-                          justifyContent="center"
-                        >
-                          <WarningIcon color="red.400" />
-                        </Box>
-                        <Text fontSize="xs" color="red.500">
-                          No ID Card
-                        </Text>
-                      </VStack>
-                    ) : (
-                      <VStack spacing={1}>
-                        <Box
-                          boxSize="60px"
-                          bg="gray.50"
-                          border="1px solid"
-                          borderColor="gray.200"
-                          borderRadius="md"
-                          display="flex"
-                          alignItems="center"
-                          justifyContent="center"
-                        >
-                          <Text fontSize="xs" color="gray.400">
-                            N/A
-                          </Text>
-                        </Box>
-                        <Text fontSize="xs" color="gray.400">
-                          Working Prof.
-                        </Text>
-                      </VStack>
-                    )}
-                  </Td> */}
                   <Td>
                     {candidate.registrationDate
                       ? new Date(
@@ -657,7 +589,6 @@ const CandidateExport = () => {
                       </Text>
                     </Tooltip>
                   </Td>
-
                   <Td>
                     {candidate.attendance ? (
                       <CheckCircleIcon color="green.400" />
@@ -665,7 +596,21 @@ const CandidateExport = () => {
                       <WarningIcon color="gray.400" />
                     )}
                   </Td>
-
+                  <Td>
+                    <Tag
+                      size="sm"
+                      colorScheme={
+                        candidate.transportRequired ? 'teal' : 'gray'
+                      }
+                    >
+                      {candidate.transportRequired ? 'Yes' : 'No'}
+                    </Tag>
+                  </Td>
+                  <Td>
+                    <Text fontSize="sm">
+                      {candidate.pickupDropLocation || '-'}
+                    </Text>
+                  </Td>
                   <Td>
                     {candidate.adminAction ? (
                       <Tag
@@ -740,6 +685,31 @@ const CandidateExport = () => {
               <ModalBody p={6}>
                 <VStack spacing={6} align="stretch">
                   <Box>
+                    <Heading size="md" color="gray.700" mb={4}>
+                      Transport Facility
+                    </Heading>
+                    <Grid
+                      templateColumns="repeat(auto-fit, minmax(200px, 1fr))"
+                      gap={4}
+                      mb={4}
+                    >
+                      <GridItem>
+                        <Text fontSize="sm" color="gray.500">
+                          Transport Required
+                        </Text>
+                        <Text fontSize="sm" fontWeight="medium">
+                          {selectedCandidate.transportRequired ? 'Yes' : 'No'}
+                        </Text>
+                      </GridItem>
+                      <GridItem>
+                        <Text fontSize="sm" color="gray.500">
+                          Pickup/Drop Location
+                        </Text>
+                        <Text fontSize="sm" fontWeight="medium">
+                          {selectedCandidate.pickupDropLocation || '-'}
+                        </Text>
+                      </GridItem>
+                    </Grid>
                     <HStack justify="space-between" align="center" mb={4}>
                       <Heading size="md" color="gray.700">
                         Payment Information

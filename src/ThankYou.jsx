@@ -30,7 +30,6 @@ import {
   useLocation,
 } from 'react-router-dom';
 import axios from 'axios';
-import { QRCodeSVG } from 'qrcode.react';
 import SubharambhamLogo from './component/newLogo.png';
 import natureBg from './component/Subharambham-nature.jpg';
 const API_BASE =
@@ -428,7 +427,14 @@ export default function ThankYouPage() {
             ? 'Girls'
             : '';
         // Expose for use below via closure (no visual render here)
-        return <Box display="none" />;
+        return (
+          <Box
+            display="none"
+            data-group-url={groupUrl || ''}
+            data-qr-src={qrImgSrc || ''}
+            data-group-label={groupLabel || ''}
+          />
+        );
       })()}
       <Box maxW="2xl" mx="auto">
         <Flex
@@ -532,7 +538,7 @@ export default function ThankYouPage() {
                 <Box>
                   <Text fontWeight="semibold">Event Date</Text>
                   <Text fontSize="sm" color="gray.600">
-                    Thursday - 1st January 2026
+                    Thursday - 1st January 2026 | 5PM Onwards
                   </Text>
                 </Box>
               </Flex>

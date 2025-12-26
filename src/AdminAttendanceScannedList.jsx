@@ -248,6 +248,8 @@ const AdminAttendanceScannedList = () => {
                 <Th>College</Th>
                 <Th>Branch</Th>
                 <Th>Scanned At</Th>
+                <Th>Transport</Th>
+                <Th>Pickup/Drop Location</Th>
                 <Th>Status</Th>
               </Tr>
             </Thead>
@@ -286,6 +288,21 @@ const AdminAttendanceScannedList = () => {
                           candidate.adminAttendanceDate
                         ).toLocaleDateString()
                       : ''}
+                  </Td>
+                  <Td>
+                    <Tag
+                      size="sm"
+                      colorScheme={
+                        candidate.transportRequired ? 'teal' : 'gray'
+                      }
+                    >
+                      {candidate.transportRequired ? 'Yes' : 'No'}
+                    </Tag>
+                  </Td>
+                  <Td>
+                    <Text fontSize="sm">
+                      {candidate.pickupDropLocation || '-'}
+                    </Text>
                   </Td>
                   <Td>
                     <Tag colorScheme="green" size="sm">

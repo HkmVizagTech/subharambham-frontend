@@ -30,7 +30,6 @@ import {
 } from '@chakra-ui/react';
 import { CalendarIcon } from '@chakra-ui/icons';
 import Select from 'react-select';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import natureBg from './component/Subharambham-nature.jpg';
 
@@ -48,6 +47,8 @@ const initialState = {
   dob: '', // 01/01/2000
   howDidYouKnow: '', // Whatsapp Message
   amount: '1.00', // Registration fee
+  transportRequired: '', // 'yes' or 'no'
+  pickupDropLocation: '',
   // studentIdCard: null, // File object
   // studentIdCardPreview: '', // Preview URL
 };
@@ -59,11 +60,65 @@ const RAZORPAY_KEY = 'rzp_live_HBAc3tlMK0X5Xd';
 const API_BASE = `https://hkm-subharambham-backend-882278565284.asia-south1.run.app/users`;
 // const API_BASE = 'http://localhost:3300/users';
 
+const COLLEGE_ORDERED_LIST = [
+  'Andhra University',
+  'GITAM university',
+  'GVP College of Engineering, Kommadi ',
+  'ANITS College',
+  'NSRIT College, ',
+  'GVP College, Rushikonda',
+  'IIM Visakhapatnam, Gambhiram',
+  'Sun college',
+  'Lendi college,',
+  'Raghu College,',
+  'GVP Medical College,',
+  'Chaitanya engineering college,',
+  'BABA engineering college,',
+  'Samata college,',
+  'GVP Degree college,',
+  'IIAM college MVP Colony,',
+  'Alwardas degree college,',
+  'Bullayya College,',
+  'BVK degree college',
+  'Prism degree college,',
+  'Krishna Degree College,',
+  'Alliance college,',
+  'Southern college,',
+  'Aditya Degree college,',
+  'Unity degree college,',
+  'Vignan college',
+  'GVP Rushikonda, ',
+  'Sai Ganapati College,',
+  'Centurion University  ',
+  'AVANTI  College ',
+  'NRI Medical College',
+];
+
 const Main = () => {
   const toast = useToast();
   const navigate = useNavigate();
   const [collegeOptions, setCollegeOptions] = useState([]);
   const [formData, setFormData] = useState(initialState);
+  const pickupPoints = [
+    'Gajuwaka',
+    'Sheela Nagar',
+    'NAD',
+    'Birla Junction',
+    'Urvasi Jn',
+    'Akkayyapalem',
+    'Gurudwara',
+    'Satyam Junction',
+    'Maddilapalem',
+    'Isukathota',
+    'Venkojipalem',
+    'Hanumanathawaka',
+    'Yendada',
+    'Car shed Jn',
+    'Madhurawada',
+    'Kommadi',
+    'Tagarapuvalasa',
+    'Sontyam',
+  ];
   const [otherCollege, setOtherCollege] = useState('');
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -83,18 +138,52 @@ const Main = () => {
   useEffect(() => {
     const fetchColleges = async () => {
       try {
-        const res = await axios.get(
-          'https://vrc-server-110406681774.asia-south1.run.app/college'
-        );
-        const options = res.data.map(college => ({
-          label: college.name,
-          value: college.name,
-        }));
+        const res = await fetch(`${API_BASE}/college`);
+        const server = await res.json();
+        const normalize = str =>
+          (str || '')
+            .toString()
+            .toLowerCase()
+            .replace(/\s+/g, ' ')
+            .trim()
+            .replace(/[.,]+$/g, '');
+
+        const serverMap = new Map(server.map(s => [normalize(s.name), s]));
+
+        const options = [];
+        for (const name of COLLEGE_ORDERED_LIST) {
+          const key = normalize(name);
+          if (serverMap.has(key)) {
+            const s = serverMap.get(key);
+            options.push({ label: s.name, value: s.name });
+            serverMap.delete(key);
+          } else {
+            options.push({ label: name, value: name });
+          }
+        }
+
+        // append remaining server entries (those not in ordered list)
+        for (const s of server) {
+          const key = normalize(s.name);
+          if (serverMap.has(key)) {
+            options.push({ label: s.name, value: s.name });
+            serverMap.delete(key);
+          }
+        }
 
         options.push({ label: 'Other College', value: 'Other College' });
         setCollegeOptions(options);
       } catch (err) {
-        console.error('Failed to fetch colleges:', err);
+        console.error(
+          'Failed to fetch colleges, falling back to fixed list:',
+          err
+        );
+        const options = COLLEGE_ORDERED_LIST.map(name => ({
+          label: name,
+          value: name,
+        }));
+        options.push({ label: 'Other College', value: 'Other College' });
+        setCollegeOptions(options);
       }
     };
     fetchColleges();
@@ -187,6 +276,8 @@ const Main = () => {
       year,
       dob,
       howDidYouKnow,
+      transportRequired,
+      pickupDropLocation,
     } = formData;
 
     if (!name.trim()) newErrors.name = 'Name is required';
@@ -220,7 +311,14 @@ const Main = () => {
       newErrors.course = 'Course is required';
     if (collegeOrWorking === 'College' && !year)
       newErrors.year = 'Year is required';
-    // Student ID card is now optional for college students
+
+    // Transport validation
+    if (!transportRequired) {
+      newErrors.transportRequired =
+        'Please select Yes or No for transport facility';
+    } else if (transportRequired === 'yes' && !pickupDropLocation) {
+      newErrors.pickupDropLocation = 'Please select a pickup/drop location';
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0; // No errors
@@ -235,6 +333,12 @@ const Main = () => {
           ? otherCollege
           : formData.college,
     };
+
+    // Debug log for transportRequired
+    console.log(
+      'DEBUG: Sending transportRequired value:',
+      finalFormData.transportRequired
+    );
 
     if (!validateForm()) return;
     setIsSubmitting(true);
@@ -499,7 +603,7 @@ const Main = () => {
                     fontSize={{ base: 'md', md: 'lg' }}
                     color="#20603d"
                   >
-                    Thursday -1st January , 2026
+                    Thursday -1st January , 2026 | 5PM Onwards
                   </Text>
                 </HStack>
                 <HStack>
@@ -894,7 +998,59 @@ const Main = () => {
                   )}
                 </FormControl>
               )} */}
-              <FormControl isInvalid={!!errors.howDidYouKnow}>
+              <FormControl isInvalid={!!errors.transportRequired}>
+                <FormLabel color="#20603d">
+                  Do you want Transport facility to the Venue (Pickup & Drop)?{' '}
+                  <Text as="span" color="red.500">
+                    *
+                  </Text>
+                </FormLabel>
+                <RadioGroup
+                  value={formData.transportRequired}
+                  onChange={val => {
+                    handleInputChange('transportRequired', val);
+                    if (val === 'no')
+                      handleInputChange('pickupDropLocation', '');
+                  }}
+                  colorScheme="green"
+                >
+                  <HStack spacing={6}>
+                    <Radio value="yes">Yes</Radio>
+                    <Radio value="no">No</Radio>
+                  </HStack>
+                </RadioGroup>
+                <FormErrorMessage>{errors.transportRequired}</FormErrorMessage>
+              </FormControl>
+              {formData.transportRequired === 'yes' && (
+                <FormControl isInvalid={!!errors.pickupDropLocation} mt={2}>
+                  <FormLabel color="#20603d">
+                    Pickup/Drop Location{' '}
+                    <Text as="span" color="red.500">
+                      *
+                    </Text>
+                  </FormLabel>
+                  <ChakraSelect
+                    value={formData.pickupDropLocation}
+                    onChange={e =>
+                      handleInputChange('pickupDropLocation', e.target.value)
+                    }
+                    borderWidth={2}
+                    _focus={{ borderColor: '#20603d' }}
+                    bg="rgba(255,255,255,0.93)"
+                  >
+                    <option value="">--Select Pickup Point--</option>
+                    {pickupPoints.map(point => (
+                      <option key={point} value={point}>
+                        {point}
+                      </option>
+                    ))}
+                  </ChakraSelect>
+                  <FormErrorMessage>
+                    {errors.pickupDropLocation}
+                  </FormErrorMessage>
+                </FormControl>
+              )}
+              <FormControl isInvalid={!!errors.howDidYouKnow} mt={2}>
                 <FormLabel color="#20603d">
                   How you came to know about this Fest{' '}
                   <Text as="span" color="red.500">

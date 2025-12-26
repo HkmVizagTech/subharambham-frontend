@@ -31,8 +31,8 @@ const Sidebar = () => {
   if (role === 'admin') {
     sidebarLinks.push(
       { to: '/admin', label: 'All Candidates' },
-      { to: '/admin/attendance', label: 'Attendance' }
-      // { to: '/admin/college', label: 'College' },
+      { to: '/admin/attendance', label: 'Attendance' },
+      { to: '/admin/college', label: 'College' }
       // { to: '/admin/wipe', label: 'Wipeout All Data' }
     );
   }

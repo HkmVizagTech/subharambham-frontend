@@ -139,6 +139,8 @@ const AttendanceList = () => {
                 row.adminAttendanceDate || row.attendanceDate
               ).toLocaleString()
             : '',
+        'Transport Required': row.transportRequired ? 'Yes' : 'No',
+        'Pickup/Drop Location': row.pickupDropLocation || '-',
         'Registration Date': row.registrationDate
           ? new Date(row.registrationDate).toLocaleString()
           : '',
@@ -281,6 +283,8 @@ const AttendanceList = () => {
                 <Th>Email</Th>
                 <Th>Attendance</Th>
                 <Th>Attendance Date</Th>
+                <Th>Transport</Th>
+                <Th>Pickup/Drop Location</Th>
                 <Th>Registration Date</Th>
               </Tr>
             </Thead>
@@ -366,6 +370,20 @@ const AttendanceList = () => {
                               candidate.attendanceDate
                           ).toLocaleString()
                         : '-'}
+                    </Td>
+                    <Td>
+                      <Badge
+                        colorScheme={
+                          candidate.transportRequired ? 'teal' : 'gray'
+                        }
+                      >
+                        {candidate.transportRequired ? 'Yes' : 'No'}
+                      </Badge>
+                    </Td>
+                    <Td>
+                      <Text fontSize="sm">
+                        {candidate.pickupDropLocation || '-'}
+                      </Text>
                     </Td>
                     <Td>
                       {candidate.registrationDate
