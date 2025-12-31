@@ -1224,7 +1224,7 @@ const CandidateExport = () => {
                   Refund
                 </Button>
 
-                <Button
+                {/* <Button
                   colorScheme="red"
                   leftIcon={<CloseIcon />}
                   onClick={async () => {
@@ -1296,7 +1296,7 @@ const CandidateExport = () => {
                   px={8}
                 >
                   Delete
-                </Button>
+                </Button> */}
 
                 <Button variant="ghost" onClick={onClose} size="lg" px={8}>
                   Close

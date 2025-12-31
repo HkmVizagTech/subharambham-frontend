@@ -110,8 +110,8 @@ const Attendence = () => {
           View QR Codes
         </Heading>
         <Text mb={7} fontSize="md" color="gray.500">
-          Enter your WhatsApp mobile number <b>or</b> email address to view all
-          your QR codes for attendance.
+          Enter your WhatsApp mobile number {/* <b>or</b> email address  */}
+          to view all your QR codes for attendance.
         </Text>
 
         <form
@@ -120,7 +120,7 @@ const Attendence = () => {
             handleSubmit();
           }}
         >
-          <FormControl as="fieldset" mb={4}>
+          {/* <FormControl as="fieldset" mb={4}>
             <HStack spacing={4} justify="center">
               <Button
                 variant={inputType === 'phone' ? 'solid' : 'outline'}
@@ -139,7 +139,7 @@ const Attendence = () => {
                 By Email
               </Button>
             </HStack>
-          </FormControl>
+          </FormControl> */}
           {inputType === 'phone' ? (
             <FormControl isInvalid={!!error}>
               <FormLabel htmlFor="phone" fontWeight="medium">
