@@ -179,6 +179,7 @@ const CandidateExport = () => {
     try {
       const token = localStorage.getItem('token');
       let endpoint = '';
+      let method = 'POST';
 
       switch (action) {
         case 'accept':
@@ -190,60 +191,77 @@ const CandidateExport = () => {
         case 'refund':
           endpoint = `${apiBase}/users/admin/refund/${candidateId}`;
           break;
+        case 'delete':
+          endpoint = `${apiBase}/api/candidates/${candidateId}`;
+          method = 'DELETE';
+          break;
         default:
           console.error('Invalid action:', action);
           return;
       }
 
       const response = await fetch(endpoint, {
-        method: 'POST',
+        method,
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
       });
 
+      let result;
+      try {
+        result = await response.json();
+      } catch {
+        result = { message: 'Unexpected response from server.' };
+      }
+
       if (response.ok) {
-        const result = await response.json();
-
-        setData(prevData =>
-          prevData.map(candidate =>
-            candidate._id === candidateId
-              ? { ...candidate, ...result.data }
-              : candidate
-          )
-        );
-
-        // Update selected candidate if it's the same one
-        if (selectedCandidate?._id === candidateId) {
-          setSelectedCandidate(prev => ({ ...prev, ...result.data }));
+        if (action === 'delete') {
+          toast({
+            title: 'Candidate deleted successfully!',
+            status: 'success',
+            duration: 3000,
+            isClosable: true,
+          });
+          setData(prev => prev.filter(c => c._id !== candidateId));
+          onClose();
+        } else {
+          setData(prevData =>
+            prevData.map(candidate =>
+              candidate._id === candidateId
+                ? { ...candidate, ...result.data }
+                : candidate
+            )
+          );
+          // Update selected candidate if it's the same one
+          if (selectedCandidate?._id === candidateId) {
+            setSelectedCandidate(prev => ({ ...prev, ...result.data }));
+          }
+          let successMessage = '';
+          switch (action) {
+            case 'accept':
+              successMessage =
+                'Candidate accepted and WhatsApp notification sent!';
+              break;
+            case 'reject':
+              successMessage =
+                'Candidate rejected and WhatsApp notification sent!';
+              break;
+            case 'refund':
+              successMessage = 'Refund processed successfully!';
+              break;
+            default:
+              successMessage = `Candidate ${action}ed successfully`;
+          }
+          toast({
+            title: successMessage,
+            status: 'success',
+            duration: 3000,
+            isClosable: true,
+          });
         }
-
-        let successMessage = '';
-        switch (action) {
-          case 'accept':
-            successMessage =
-              'Candidate accepted and WhatsApp notification sent!';
-            break;
-          case 'reject':
-            successMessage =
-              'Candidate rejected and WhatsApp notification sent!';
-            break;
-          case 'refund':
-            successMessage = 'Refund processed successfully!';
-            break;
-          default:
-            successMessage = `Candidate ${action}ed successfully`;
-        }
-
-        toast({
-          title: successMessage,
-          status: 'success',
-          duration: 3000,
-          isClosable: true,
-        });
       } else {
-        throw new Error(`Failed to ${action} candidate`);
+        throw new Error(result.message || `Failed to ${action} candidate`);
       }
     } catch (error) {
       toast({
@@ -1206,6 +1224,80 @@ const CandidateExport = () => {
                   Refund
                 </Button>
 
+                <Button
+                  colorScheme="red"
+                  leftIcon={<CloseIcon />}
+                  onClick={async () => {
+                    if (!selectedCandidate?._id) return;
+                    setActionLoading(prev => ({
+                      ...prev,
+                      [selectedCandidate._id]: true,
+                    }));
+                    try {
+                      const token = localStorage.getItem('token');
+                      const res = await fetch(
+                        `${apiBase}/api/candidates/${selectedCandidate._id}`,
+                        {
+                          method: 'DELETE',
+                          headers: {
+                            'Content-Type': 'application/json',
+                            ...(token
+                              ? { Authorization: `Bearer ${token}` }
+                              : {}),
+                          },
+                        }
+                      );
+                      let result;
+                      try {
+                        result = await res.json();
+                      } catch {
+                        result = {
+                          message: 'Unexpected response from server.',
+                        };
+                      }
+                      if (res.ok) {
+                        toast({
+                          title: 'Candidate deleted successfully!',
+                          status: 'success',
+                          duration: 3000,
+                          isClosable: true,
+                        });
+                        setData(prev =>
+                          prev.filter(c => c._id !== selectedCandidate._id)
+                        );
+                        onClose();
+                      } else {
+                        toast({
+                          title: 'Delete failed',
+                          description:
+                            result.message || 'Error deleting candidate.',
+                          status: 'error',
+                          duration: 5000,
+                          isClosable: true,
+                        });
+                      }
+                    } catch (err) {
+                      toast({
+                        title: 'Delete failed',
+                        description: err.message,
+                        status: 'error',
+                        duration: 5000,
+                        isClosable: true,
+                      });
+                    } finally {
+                      setActionLoading(prev => ({
+                        ...prev,
+                        [selectedCandidate._id]: false,
+                      }));
+                    }
+                  }}
+                  isLoading={actionLoading[selectedCandidate?._id]}
+                  size="lg"
+                  px={8}
+                >
+                  Delete
+                </Button>
+
                 <Button variant="ghost" onClick={onClose} size="lg" px={8}>
                   Close
                 </Button>
@@ -1256,6 +1348,17 @@ const CandidateExport = () => {
                     <Text fontSize="sm" color="gray.600" mt={2}>
                       💰 The payment will be refunded through Razorpay. This
                       action cannot be undone.
+                    </Text>
+                  </>
+                )}
+                {alertAction?.action === 'delete' && (
+                  <>
+                    Are you sure you want to <strong>delete</strong> this
+                    candidate?
+                    <br />
+                    <Text fontSize="sm" color="red.600" mt={2}>
+                      This action cannot be undone. All candidate data will be
+                      permanently removed.
                     </Text>
                   </>
                 )}

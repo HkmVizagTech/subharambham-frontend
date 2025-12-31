@@ -24,7 +24,9 @@ import { QRCodeSVG } from 'qrcode.react';
 import { api } from './utils/api';
 
 const Attendence = () => {
+  const [inputType, setInputType] = useState('phone'); // 'phone' or 'email'
   const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [candidates, setCandidates] = useState([]);
@@ -38,30 +40,36 @@ const Attendence = () => {
     setTotalCandidates(0);
     setNotFound(false);
     setGenericError('');
-    const trimmedPhone = phone.trim().replace(/\D/g, '');
 
-    if (!/^\d{10}$/.test(trimmedPhone)) {
-      setError('Please enter a valid 10-digit phone number.');
-      return;
+    let payload = {};
+    if (inputType === 'phone') {
+      const trimmedPhone = phone.trim().replace(/\D/g, '');
+      if (!/^\d{10}$/.test(trimmedPhone)) {
+        setError('Please enter a valid 10-digit phone number.');
+        return;
+      }
+      payload.whatsappNumber = trimmedPhone;
+    } else {
+      const trimmedEmail = email.trim();
+      if (!/^\S+@\S+\.\S+$/.test(trimmedEmail)) {
+        setError('Please enter a valid email address.');
+        return;
+      }
+      payload.email = trimmedEmail;
     }
 
     setLoading(true);
     try {
-      const res = await api.post('/users/get-qr-codes', {
-        whatsappNumber: trimmedPhone,
-      });
-
+      const res = await api.post('/users/get-qr-codes', payload);
       const data = await res.json();
-
       if (res.ok) {
-        console.log('✅ QR codes response:', data);
-
         if (data.candidates && data.candidates.length > 0) {
           setCandidates(data.candidates);
           setTotalCandidates(data.totalCandidates || data.candidates.length);
           setPhone('');
+          setEmail('');
         } else {
-          setGenericError('No QR codes found for this number');
+          setGenericError('No QR codes found for this identifier');
         }
       } else {
         const errMsg = data?.message?.toLowerCase() || '';
@@ -112,33 +120,74 @@ const Attendence = () => {
             handleSubmit();
           }}
         >
-          <FormControl isInvalid={!!error}>
-            <FormLabel htmlFor="phone" fontWeight="medium">
-              WhatsApp Number
-            </FormLabel>
-            <InputGroup>
-              <InputLeftAddon children="+91" />
+          <FormControl as="fieldset" mb={4}>
+            <HStack spacing={4} justify="center">
+              <Button
+                variant={inputType === 'phone' ? 'solid' : 'outline'}
+                colorScheme="teal"
+                onClick={() => setInputType('phone')}
+                isDisabled={loading}
+              >
+                By Phone
+              </Button>
+              <Button
+                variant={inputType === 'email' ? 'solid' : 'outline'}
+                colorScheme="teal"
+                onClick={() => setInputType('email')}
+                isDisabled={loading}
+              >
+                By Email
+              </Button>
+            </HStack>
+          </FormControl>
+          {inputType === 'phone' ? (
+            <FormControl isInvalid={!!error}>
+              <FormLabel htmlFor="phone" fontWeight="medium">
+                WhatsApp Number
+              </FormLabel>
+              <InputGroup>
+                <InputLeftAddon children="+91" />
+                <Input
+                  id="phone"
+                  type="tel"
+                  placeholder="10-digit mobile"
+                  value={phone}
+                  onChange={e => {
+                    const val = e.target.value.replace(/\D/g, '');
+                    if (val.length <= 10) setPhone(val);
+                  }}
+                  maxLength={10}
+                  autoComplete="tel"
+                  bg="gray.100"
+                  fontWeight="medium"
+                  letterSpacing="wide"
+                  required={inputType === 'phone'}
+                  isDisabled={loading}
+                />
+              </InputGroup>
+              <FormErrorMessage>{error}</FormErrorMessage>
+            </FormControl>
+          ) : (
+            <FormControl isInvalid={!!error}>
+              <FormLabel htmlFor="email" fontWeight="medium">
+                Email Address
+              </FormLabel>
               <Input
-                id="phone"
-                type="tel"
-                placeholder="10-digit mobile"
-                value={phone}
-                onChange={e => {
-                  const val = e.target.value.replace(/\D/g, '');
-                  if (val.length <= 10) setPhone(val);
-                }}
-                maxLength={10}
-                autoComplete="tel"
+                id="email"
+                type="email"
+                placeholder="Enter your email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                autoComplete="email"
                 bg="gray.100"
                 fontWeight="medium"
                 letterSpacing="wide"
-                required
+                required={inputType === 'email'}
                 isDisabled={loading}
               />
-            </InputGroup>
-            <FormErrorMessage>{error}</FormErrorMessage>
-          </FormControl>
-
+              <FormErrorMessage>{error}</FormErrorMessage>
+            </FormControl>
+          )}
           <Button
             mt={6}
             colorScheme="teal"
@@ -146,7 +195,9 @@ const Attendence = () => {
             type="submit"
             isLoading={loading}
             loadingText="Loading..."
-            disabled={loading || phone.length !== 10}
+            disabled={
+              loading || (inputType === 'phone' ? phone.length !== 10 : !email)
+            }
             fontWeight="bold"
             fontSize="lg"
             borderRadius="lg"
