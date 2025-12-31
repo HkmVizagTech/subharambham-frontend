@@ -110,8 +110,8 @@ const Attendence = () => {
           View QR Codes
         </Heading>
         <Text mb={7} fontSize="md" color="gray.500">
-          Enter your WhatsApp mobile number to view all your QR codes for
-          attendance.
+          Enter your WhatsApp mobile number <b>or</b> email address to view all
+          your QR codes for attendance.
         </Text>
 
         <form
