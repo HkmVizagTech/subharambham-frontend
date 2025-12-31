@@ -998,29 +998,9 @@ const Main = () => {
                   )}
                 </FormControl>
               )} */}
-              <FormControl isInvalid={!!errors.transportRequired}>
-                <FormLabel color="#20603d">
-                  Do you want Transport facility to the Venue (Pickup & Drop)?{' '}
-                  <Text as="span" color="red.500">
-                    *
-                  </Text>
-                </FormLabel>
-                <RadioGroup
-                  value={formData.transportRequired}
-                  onChange={val => {
-                    handleInputChange('transportRequired', val);
-                    if (val === 'no')
-                      handleInputChange('pickupDropLocation', '');
-                  }}
-                  colorScheme="green"
-                >
-                  <HStack spacing={6}>
-                    <Radio value="yes">Yes</Radio>
-                    <Radio value="no">No</Radio>
-                  </HStack>
-                </RadioGroup>
-                <FormErrorMessage>{errors.transportRequired}</FormErrorMessage>
-              </FormControl>
+              {/* Transport facility question hidden, default set to 'no' */}
+              {formData.transportRequired !== 'no' &&
+                handleInputChange('transportRequired', 'no')}
               {formData.transportRequired === 'yes' && (
                 <FormControl isInvalid={!!errors.pickupDropLocation} mt={2}>
                   <FormLabel color="#20603d">
